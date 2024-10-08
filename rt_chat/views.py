@@ -8,7 +8,7 @@ from .forms import ChatmessageCreateForm
 def chat_view(request):
     chat_group = get_object_or_404(ChatGroup, group_name="public-chat")
     chat_messages = chat_group.chat_messages.all()[:30]
-    #chat_messages = list(reversed(chat_messages))
+    chat_messages = list(reversed(chat_messages))
     form = ChatmessageCreateForm()
 
     if request.htmx:
@@ -22,7 +22,7 @@ def chat_view(request):
                 'message' : message,
                 'user' : request.user
             }
-            
+
             return render(request, 'rt_chat/partials/chat_message_p.html', context)
     
     context = {
