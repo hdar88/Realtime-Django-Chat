@@ -3,6 +3,10 @@ from django.contrib.auth.decorators import login_required
 from .models import *
 from .forms import ChatmessageCreateForm
 
+'''handles creating and displaying chat messages
+@param request: the HTTP request object
+@return: a rendered template with the chat messages and form for creating a new message
+@Note: this view is used by the HTMX library for real-time updates in the chat room directly via HTML'''
 
 @login_required
 def chat_view(request):

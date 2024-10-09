@@ -2,6 +2,7 @@ from django.forms import ModelForm
 from django import forms
 from .models import *
 
+'''Form for creating a new chat message using the GroupMessage model.'''
 
 class ChatmessageCreateForm(ModelForm):
     class Meta:
