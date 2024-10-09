@@ -7,6 +7,10 @@ import json
 from .models import *
 
 class ChatroomConsumer(WebsocketConsumer):
+
+   '''connect to the websocket and join the chatroom group
+   @param self: the current consumer instance
+   ''' 
     def connect(self):
         self.user = self.scope['user']
         self.chatroom_name = self.scope['url_route']['kwargs']['chatroom_name']
@@ -26,6 +30,10 @@ class ChatroomConsumer(WebsocketConsumer):
 
         self.accept()
     
+    '''disconnect from the websocket and leave the chatroom group
+    @param self: the current consumer instance
+    @param close_code: the close code received from the client
+    '''
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
             self.chatroom_name, self.channel_name
@@ -36,6 +44,10 @@ class ChatroomConsumer(WebsocketConsumer):
             self.chatroom.users_online.remove(self.user)
             self.update_online_count()
 
+    '''receive messages from the websocket and broadcast them to the group
+    @param self: the current consumer instance
+    @param text_data: the text data received from the client
+    '''
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         body = text_data_json['body']
@@ -55,6 +67,10 @@ class ChatroomConsumer(WebsocketConsumer):
             self.chatroom_name, event
         )
 
+    '''broadcast messages to the group
+    @param self: the current consumer instance
+    @param event: the event data received from the group
+    '''    
     def message_handler(self, event):
         message_id = event['message_id']
         message = GroupMessage.objects.get(id=message_id)
@@ -65,6 +81,9 @@ class ChatroomConsumer(WebsocketConsumer):
         html= render_to_string("rt_chat/partials/chat_message_p.html", context= context)
         self.send(text_data=html)
     
+    '''update the current online users count in the group
+    @param self: the current consumer instance
+    '''
     def update_online_count(self):
         online_count = self.chatroom.users_online.count() -1
 
@@ -74,6 +93,10 @@ class ChatroomConsumer(WebsocketConsumer):
         }
         async_to_sync(self.channel_layer.group_send)(self.chatroom_name, event)
 
+    '''broadcast the current online users count to the group
+    @param self: the current consumer instance
+    @param event: the event data received from the group
+    '''    
     def online_count_handler(self, event):
         online_count = event['online_count']
         context = {
